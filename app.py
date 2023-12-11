@@ -38,8 +38,8 @@ def capture_and_save_image(label, save_folder):
         cv2.imwrite(image_path, cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
         # Display the image
-        st.image(cv2_img, caption=f"{label} Image")
-        st.success(f"{label} Image captured and saved in {save_folder}")
+        # st.image(cv2_img, caption=f"{label} Image")
+        # st.success(f"{label} Image captured and saved in {save_folder}")
 
 def capture_and_save_image_test(label, save_folder):
     img_file_buffer = st.camera_input("Take Photo and then click Capture button again!")
@@ -61,8 +61,8 @@ def capture_and_save_image_test(label, save_folder):
         cv2.imwrite(image_path, cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
         # Display the image
-        st.image(cv2_img, caption=f"{label} Image")
-        st.success(f"{label} Image captured and saved in {save_folder}")
+        # st.image(cv2_img, caption=f"{label} Image")
+        # st.success(f"{label} Image captured and saved in {save_folder}")
 
 
 session_state = st.session_state
@@ -359,70 +359,75 @@ elif section == "Collect Data":
 
     # Display images of the user \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     # Specify the path to the folder containing your images
-    folder_path = "captured_images/me"
+    col1, col2 = st.columns(2)
 
-    # Get the list of image files in the folder
-    image_files = list_images(folder_path)
-
-    # Display images in 4 columns
-    num_columns = 6
-    col_width = int(12 / num_columns)  # Divide the total width into equal parts
-
-    for i in range(0, len(image_files), num_columns):
+    with col1:
         st.markdown("<div class='center'><h2 id='Section-4'>Captured 'ME' Images</h2></div>", unsafe_allow_html=True)
 
-        images_in_row = image_files[i:i + num_columns]
-        cols = st.columns(num_columns)
+        folder_path = "captured_images/me"
 
-        for col, image_file in zip(cols, images_in_row):
-            image_path = os.path.join(folder_path, image_file)
-            col.image(image_path, caption=image_file, use_column_width=True)
+        # Get the list of image files in the folder
+        image_files = list_images(folder_path)
 
-    file_path = 'captured_images/me/*.png'
+        # Display images in 4 columns
+        num_columns = 3
+        col_width = int(12 / num_columns)  # Divide the total width into equal parts
 
-    if glob.glob(file_path):
-        if st.button("Delete 'ME' Images"):
-                for filename in glob.glob('captured_images/me/*.png'):
-                    os.remove(filename)
-    else:
-        print('Upload some images.')
+        for i in range(0, len(image_files), num_columns):
 
-    # Display images of other people \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    # Specify the path to the folder containing your images
-    folder_path = "captured_images/not_me"
+            images_in_row = image_files[i:i + num_columns]
+            cols = st.columns(num_columns)
 
-    # Get the list of image files in the folder
-    image_files = list_images(folder_path)
+            for col, image_file in zip(cols, images_in_row):
+                image_path = os.path.join(folder_path, image_file)
+                col.image(image_path, caption=image_file, use_column_width=True)
 
-    # Display images in 4 columns
-    num_columns = 6
-    col_width = int(12 / num_columns)  # Divide the total width into equal parts
+        file_path = 'captured_images/me/*.png'
 
-    for i in range(0, len(image_files), num_columns):
+        if glob.glob(file_path):
+            if st.button("Delete 'ME' Images"):
+                    for filename in glob.glob('captured_images/me/*.png'):
+                        os.remove(filename)
+        else:
+            print('Upload some images.')
+
+    with col2:
         st.markdown("<div class='center'><h2 id='Section-4'>Captured 'NOT ME' Images</h2></div>", unsafe_allow_html=True)
+        # Display images of other people \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        # Specify the path to the folder containing your images
+        folder_path = "captured_images/not_me"
 
-        images_in_row = image_files[i:i + num_columns]
-        cols = st.columns(num_columns)
+        # Get the list of image files in the folder
+        image_files = list_images(folder_path)
 
-        for col, image_file in zip(cols, images_in_row):
-            image_path = os.path.join(folder_path, image_file)
-            col.image(image_path, caption=image_file, use_column_width=True)
-    if hasattr(st.session_state, 'not_me_files') and st.session_state.not_me_files:
-        num_columns = 6  # Change this to 5 if you want 5 images in a row
-        not_me_files = st.session_state.not_me_files
-        row2 = st.columns(num_columns)
-        for i, file in enumerate(not_me_files):
-            row2[i % num_columns].image(file, caption="Other People's Image", use_column_width=True)
+        # Display images in 4 columns
+        num_columns = 3
+        col_width = int(12 / num_columns)  # Divide the total width into equal parts
 
-    file_path = 'captured_images/not_me/*.png'
+        for i in range(0, len(image_files), num_columns):
 
-    if glob.glob(file_path):
-        if st.button("Delete 'Not ME' Images"):
-                for filename in glob.glob('captured_images/not_me/*.png'):
-                    os.remove(filename)
-    else:
-        print('Upload some images.')
-    
+            images_in_row = image_files[i:i + num_columns]
+            cols = st.columns(num_columns)
+
+            for col, image_file in zip(cols, images_in_row):
+                image_path = os.path.join(folder_path, image_file)
+                col.image(image_path, caption=image_file, use_column_width=True)
+        if hasattr(st.session_state, 'not_me_files') and st.session_state.not_me_files:
+            num_columns = 6  # Change this to 5 if you want 5 images in a row
+            not_me_files = st.session_state.not_me_files
+            row2 = st.columns(num_columns)
+            for i, file in enumerate(not_me_files):
+                row2[i % num_columns].image(file, caption="Other People's Image", use_column_width=True)
+
+        file_path = 'captured_images/not_me/*.png'
+
+        if glob.glob(file_path):
+            if st.button("Delete 'Not ME' Images"):
+                    for filename in glob.glob('captured_images/not_me/*.png'):
+                        os.remove(filename)
+        else:
+            print('Upload some images.')
+        
 
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)    
