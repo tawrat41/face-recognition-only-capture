@@ -3,6 +3,8 @@ import numpy as np
 import os
 import time
 import cv2
+import glob
+import os
 from PIL import Image
 from tensorflow.keras.applications.resnet50 import preprocess_input, ResNet50
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
@@ -347,7 +349,6 @@ elif section == "Collect Data":
                 capture_and_save_image('not_me', os.path.abspath('captured_images/not_me'))
 
     # Display uploaded and captured images
-    st.markdown("<div class='center'><h2 id='Section-4'>Uploaded and Captured Images</h2></div>", unsafe_allow_html=True)
 
     def list_images(folder_path):
         # Get a list of all files in the folder
@@ -358,7 +359,6 @@ elif section == "Collect Data":
 
     # Display images of the user \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     # Specify the path to the folder containing your images
-    st.markdown("<h3>Your Images</h3>", unsafe_allow_html=True)
     folder_path = "captured_images/me"
 
     # Get the list of image files in the folder
@@ -369,6 +369,8 @@ elif section == "Collect Data":
     col_width = int(12 / num_columns)  # Divide the total width into equal parts
 
     for i in range(0, len(image_files), num_columns):
+        st.markdown("<div class='center'><h2 id='Section-4'>Captured 'ME' Images</h2></div>", unsafe_allow_html=True)
+
         images_in_row = image_files[i:i + num_columns]
         cols = st.columns(num_columns)
 
@@ -376,8 +378,16 @@ elif section == "Collect Data":
             image_path = os.path.join(folder_path, image_file)
             col.image(image_path, caption=image_file, use_column_width=True)
 
+    file_path = 'captured_images/me/*.png'
+
+    if glob.glob(file_path):
+        if st.button("Delete 'ME' Images"):
+                for filename in glob.glob('captured_images/me/*.png'):
+                    os.remove(filename)
+    else:
+        print('Upload some images.')
+
     # Display images of other people \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    st.markdown("<h3>Other People's Images</h3>", unsafe_allow_html=True)
     # Specify the path to the folder containing your images
     folder_path = "captured_images/not_me"
 
@@ -389,6 +399,8 @@ elif section == "Collect Data":
     col_width = int(12 / num_columns)  # Divide the total width into equal parts
 
     for i in range(0, len(image_files), num_columns):
+        st.markdown("<div class='center'><h2 id='Section-4'>Captured 'NOT ME' Images</h2></div>", unsafe_allow_html=True)
+
         images_in_row = image_files[i:i + num_columns]
         cols = st.columns(num_columns)
 
@@ -401,6 +413,16 @@ elif section == "Collect Data":
         row2 = st.columns(num_columns)
         for i, file in enumerate(not_me_files):
             row2[i % num_columns].image(file, caption="Other People's Image", use_column_width=True)
+
+    file_path = 'captured_images/not_me/*.png'
+
+    if glob.glob(file_path):
+        if st.button("Delete 'Not ME' Images"):
+                for filename in glob.glob('captured_images/not_me/*.png'):
+                    os.remove(filename)
+    else:
+        print('Upload some images.')
+    
 
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)    
