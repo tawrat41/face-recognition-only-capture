@@ -20,7 +20,7 @@ st.set_page_config(
 
 # Function to capture image from webcam using OpenCV
 def capture_and_save_image(label, save_folder):
-    img_file_buffer = st.camera_input("Take Photo")
+    img_file_buffer = st.camera_input("")
  
     if img_file_buffer is not None:
         # Read image file buffer with OpenCV
