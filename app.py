@@ -295,21 +295,40 @@ elif section == "Collect Data":
         os.makedirs('captured_images/not_me')
         os.makedirs('captured_images/test_capture')
 
+    
+
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("""
                 <div class="container" id='collect-image'> <span id='data-collect'>1</span> <p>Let’s start by giving the machine lots of images of you in different places, in different poses, and at different angles. </p> </div>""", unsafe_allow_html=True)
-
-        st.markdown(""" <h4 style="margin-top:15px">Capture some images of yourself</h4>  """, unsafe_allow_html=True)
-        with st.form(key='me_form'):
-            if st.form_submit_button("Capture and Save Photos of yourself"):
-                capture_and_save_image('me', os.path.abspath('captured_images/me'))
 
     with col2:
         st.markdown("""
                     <div class="container" id='collect-image'><span id='data-collect'>2</span> <p>Next, let’s give it images of people that are not you, so the machine understands the difference.</p>
                 </div>""", unsafe_allow_html=True)
 
+    st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1,2,1])
+    with col1:
+        pass
+    with col2:
+        image5 = Image.open('media/Flowchart.png')
+        st.image(image5, caption='')
+    with col3:
+        pass
+    st.markdown("<div class = 'center'><h5 id='' style='color: black;'>Now, follow the above mentioned steps to capture image</h5></div>", unsafe_allow_html=True)
+
+    
+    st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
+   
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(""" <h4 style="margin-top:15px">Capture some images of yourself</h4>  """, unsafe_allow_html=True)
+        with st.form(key='me_form'):
+            if st.form_submit_button("Capture and Save Photos of yourself"):
+                capture_and_save_image('me', os.path.abspath('captured_images/me'))
+    with col2:
         st.markdown(""" <h4 style="margin-top:15px">Capture some images of other people</h4>  """ , unsafe_allow_html=True)
         with st.form(key='not_me_form'):
             if st.form_submit_button("Capture and Save Photos of others"):
@@ -328,12 +347,13 @@ elif section == "Collect Data":
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("<div class='center'><h2 id='Section-4'>Captured 'ME' Images</h2></div>", unsafe_allow_html=True)
-
         folder_path = "captured_images/me"
-
         # Get the list of image files in the folder
         image_files = list_images(folder_path)
+
+        # Check if there are images in the folder
+        if image_files:
+            st.markdown("<div class='center'><h2 id='Section-4'>Captured Images of yourself</h2></div>", unsafe_allow_html=True)
 
         # Display images in 4 columns
         num_columns = 3
@@ -358,14 +378,13 @@ elif section == "Collect Data":
                     
 
     with col2:
-        st.markdown("<div class='center'><h2 id='Section-4'>Captured 'NOT ME' Images</h2></div>", unsafe_allow_html=True)
-        # Display images of other people \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        # Specify the path to the folder containing your images
         folder_path = "captured_images/not_me"
 
         # Get the list of image files in the folder
         image_files = list_images(folder_path)
 
+        if image_files:   
+            st.markdown("<div class='center'><h2 id='Section-4'>Captured Images of Other People</h2></div>", unsafe_allow_html=True)
         # Display images in 4 columns
         num_columns = 3
         col_width = int(12 / num_columns)  # Divide the total width into equal parts
