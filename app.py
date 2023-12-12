@@ -20,8 +20,8 @@ st.set_page_config(
 
 # Function to capture image from webcam using OpenCV
 def capture_and_save_image(label, save_folder):
-    img_file_buffer = st.camera_input("Take Photo and then click Capture button again!")
-
+    img_file_buffer = st.camera_input("Take Photo")
+ 
     if img_file_buffer is not None:
         # Read image file buffer with OpenCV
         bytes_data = img_file_buffer.getvalue()
@@ -38,31 +38,9 @@ def capture_and_save_image(label, save_folder):
         cv2.imwrite(image_path, cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
         # Display the image
-        # st.image(cv2_img, caption=f"{label} Image")
-        # st.success(f"{label} Image captured and saved in {save_folder}")
+        # st.image(cv2_img, caption=f"{label} Image", use_column_width=True)
+        st.success("Image Saved !")
 
-def capture_and_save_image_test(label, save_folder):
-    img_file_buffer = st.camera_input("Take Photo and then click Capture button again!")
-
-    if img_file_buffer is not None:
-        # Read image file buffer with OpenCV
-        bytes_data = img_file_buffer.getvalue()
-        cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-
-        # Save the image
-        if not os.path.exists(save_folder):
-            os.makedirs(save_folder)
-
-        # Use a fixed name for the image to overwrite the existing one
-        image_name = f"{label}_captured.png"
-        image_path = os.path.join(save_folder, image_name)
-
-        # Save the image to the specified folder
-        cv2.imwrite(image_path, cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
-
-        # Display the image
-        # st.image(cv2_img, caption=f"{label} Image")
-        # st.success(f"{label} Image captured and saved in {save_folder}")
 
 
 session_state = st.session_state
@@ -275,22 +253,6 @@ elif section == "Step - 1":
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
     col0, col1, col2, col3, col4, col5, col6 = st.columns(7)
     with col0:
-    # st.markdown("""
-    #     <style>
-    #     button[kind="primary"]  {
-    #         background-color: white;
-    #         color: grey;
-    #         font-weight: bold #ff0a54;
-    #         border: 2px solid ;
-    #         display: block;
-    #         margin-left: auto;
-    #         margin-right: auto;
-    #         # width: 8rem;
-    #         # text-align: center;
-    #         padding-left: 15px;
-    #         padding-right: 15px;
-    #     }
-    #     </style>""", unsafe_allow_html=True)
         st.button("Step 1", key="step1", help="Collect Data", on_click=lambda: st.session_state.update({"page_index": 3}))
         st.markdown("""<p style="font-weight: bold;">Collect Data</p>""", unsafe_allow_html=True)
     with col1:
@@ -328,6 +290,11 @@ elif section == "Collect Data":
     st.markdown("""
                 <div class=container style="margin-bottom:20px;"> <p>We want our model to learn how to recognize your face. We will need two kinds of images for this - images of you, and images of people who are not you. This way, the model will learn to recognize how you look and also recognize how you don’t look. </p>  </div> """, unsafe_allow_html=True)
 
+    if not os.path.exists('captured_images'):
+        os.makedirs('captured_images/me')
+        os.makedirs('captured_images/not_me')
+        os.makedirs('captured_images/test_capture')
+
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("""
@@ -335,7 +302,7 @@ elif section == "Collect Data":
 
         st.markdown(""" <h4 style="margin-top:15px">Capture some images of yourself</h4>  """, unsafe_allow_html=True)
         with st.form(key='me_form'):
-            if st.form_submit_button("Capture 'me' Image"):
+            if st.form_submit_button("Capture and Save Photos of yourself"):
                 capture_and_save_image('me', os.path.abspath('captured_images/me'))
 
     with col2:
@@ -345,11 +312,10 @@ elif section == "Collect Data":
 
         st.markdown(""" <h4 style="margin-top:15px">Capture some images of other people</h4>  """ , unsafe_allow_html=True)
         with st.form(key='not_me_form'):
-            if st.form_submit_button("Capture 'not me' Image"):
+            if st.form_submit_button("Capture and Save Photos of others"):
                 capture_and_save_image('not_me', os.path.abspath('captured_images/not_me'))
 
     # Display uploaded and captured images
-
     def list_images(folder_path):
         # Get a list of all files in the folder
         files = os.listdir(folder_path)
@@ -386,10 +352,10 @@ elif section == "Collect Data":
 
         if glob.glob(file_path):
             if st.button("Delete 'ME' Images"):
-                    for filename in glob.glob('captured_images/me/*.png'):
-                        os.remove(filename)
-        else:
-            print('Upload some images.')
+                for filename in glob.glob('captured_images/me/*.png'):
+                    os.remove(filename)
+                st.experimental_rerun()
+                    
 
     with col2:
         st.markdown("<div class='center'><h2 id='Section-4'>Captured 'NOT ME' Images</h2></div>", unsafe_allow_html=True)
@@ -423,10 +389,9 @@ elif section == "Collect Data":
 
         if glob.glob(file_path):
             if st.button("Delete 'Not ME' Images"):
-                    for filename in glob.glob('captured_images/not_me/*.png'):
-                        os.remove(filename)
-        else:
-            print('Upload some images.')
+                for filename in glob.glob('captured_images/not_me/*.png'):
+                    os.remove(filename)
+                st.experimental_rerun()
         
 
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
@@ -922,6 +887,9 @@ elif section == "Test":
                 <div class=container style="margin-bottom:20px;"> <p>
                 It's time to put the model to the test. You can evaluate its performance by either <span id="test-span">uploading</span> an image or <span id="test-span">capturing</span> one in real-time. This testing phase will help you assess the model's capabilities in handling visual data, giving you valuable insights into its effectiveness. Choose the method that suits your evaluation preferences, whether it's uploading a pre-existing image or utilizing the model's image-capturing feature for a more dynamic experience.</p>  </div> """, unsafe_allow_html=True)
 
+    # if not os.path.exists('captured_images'):
+    #     os.makedirs('captured_images/test_capture')
+
 
     col1, col2, col3 = st.columns(3)
 
@@ -936,7 +904,7 @@ elif section == "Test":
         st.markdown(""" <h4 style="margin-bottom:30px">Capture Test Image</h4>  """ , unsafe_allow_html=True)
         with st.form(key='test_form'):
             if st.form_submit_button("Capture test Image"):
-                capture_and_save_image_test('test', os.path.abspath('captured_images/test_capture'))
+                capture_and_save_image('test', os.path.abspath('captured_images/test_capture'))
             
         def list_images(folder_path):
             # Get a list of all files in the folder
