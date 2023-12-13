@@ -994,7 +994,7 @@ elif section == "Test":
                 except FileNotFoundError as e:
                     st.markdown(""" <h5 style="color:red;">Trained model not found! Train the Model first.</h5> """, unsafe_allow_html=True)
             else:
-                st.markdown(""" <h5 style="color:red;">Please upload a test image or capture one.</h5> """, unsafe_allow_html=True)
+                st.markdown(""" <h5 style="color:red;">Please capture a test image</h5> """, unsafe_allow_html=True)
 
             
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
