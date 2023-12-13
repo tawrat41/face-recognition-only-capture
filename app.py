@@ -39,7 +39,7 @@ def capture_and_save_image(label, save_folder):
 
         # Display the image
         # st.image(cv2_img, caption=f"{label} Image", use_column_width=True)
-        st.success("Image Saved !")
+        st.success("Image Captured and Saved !")
 
 
 
@@ -103,6 +103,8 @@ st.markdown(
         }
         h4{
             color: #ff0a54;
+            text-align: center;
+
         }
         h5{
             width: 100%;
@@ -906,9 +908,20 @@ elif section == "Test":
                 <div class=container style="margin-bottom:20px;"> <p>
                 It's time to put the model to the test. You can evaluate its performance by either <span id="test-span">uploading</span> an image or <span id="test-span">capturing</span> one in real-time. This testing phase will help you assess the model's capabilities in handling visual data, giving you valuable insights into its effectiveness. Choose the method that suits your evaluation preferences, whether it's uploading a pre-existing image or utilizing the model's image-capturing feature for a more dynamic experience.</p>  </div> """, unsafe_allow_html=True)
 
-    # if not os.path.exists('captured_images'):
-    #     os.makedirs('captured_images/test_capture')
+    if not os.path.exists('captured_images/test_capture'):
+        os.makedirs('captured_images/test_capture')
 
+    # col1, col2, col3 = st.columns([1,2,1])
+    # with col1:
+    #     pass
+    # with col2:
+    #     image5 = Image.open('media/Flowchart.png')
+    #     st.image(image5, caption='')
+    # with col3:
+    #     pass
+
+    st.markdown(""" <h4 style="margin-bottom:30px">Capture Test Image</h4>  """ , unsafe_allow_html=True)
+    st.markdown("<div class = 'center'><h5 id='' style='color: black;'>Just like the way you captured the training images, now capture the test image</h5></div>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
@@ -920,7 +933,7 @@ elif section == "Test":
 
     with col2: 
         # Option to capture a test image
-        st.markdown(""" <h4 style="margin-bottom:30px">Capture Test Image</h4>  """ , unsafe_allow_html=True)
+        
         with st.form(key='test_form'):
             if st.form_submit_button("Capture test Image"):
                 capture_and_save_image('test', os.path.abspath('captured_images/test_capture'))
@@ -946,49 +959,42 @@ elif section == "Test":
         # if test_image or os.path.exists('captured_images/test_capture'):     //////////// comment out if upload option is enabled
         if os.path.exists('captured_images/test_capture'):
             st.markdown(f"<h5 style='text-align: center;'>Processing test image...</h5>", unsafe_allow_html=True)
-            
-            if os.path.exists('captured_images/test_capture'):
+
+            test_image_path = None
+            image_list = os.listdir('captured_images/test_capture')
+            if image_list:
                 # Use the captured test image
-                test_image_path = os.path.join('captured_images/test_capture', os.listdir('captured_images/test_capture')[0])
-            # else:
-                # # Use the uploaded test image
-                # test_image_path = 'uploaded_test_image.png'
-                # with open(test_image_path, "wb") as f:
-                #     f.write(test_image.read())
+                test_image_path = os.path.join('captured_images/test_capture', image_list[0])
 
-            img = image.load_img(test_image_path, target_size=(224, 224))
-            img = image.img_to_array(img)
-            img = np.expand_dims(img, axis=0)
-            img = preprocess_input(img)
+            if test_image_path is not None:
+                img = image.load_img(test_image_path, target_size=(224, 224))
+                img = image.img_to_array(img)
+                img = np.expand_dims(img, axis=0)
+                img = preprocess_input(img)
 
-            # Make prediction
-            try:
-                model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-                x = model.output
-                x = GlobalAveragePooling2D()(x)
-                x = Dense(1024, activation='relu')(x)
-                predictions = Dense(2, activation='softmax')(x)  # 2 classes: 'me' and 'not me'
-                model = Model(inputs=model.input, outputs=predictions)
+                # Make prediction
+                try:
+                    model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+                    x = model.output
+                    x = GlobalAveragePooling2D()(x)
+                    x = Dense(1024, activation='relu')(x)
+                    predictions = Dense(2, activation='softmax')(x)  # 2 classes: 'me' and 'not me'
+                    model = Model(inputs=model.input, outputs=predictions)
 
-                model.load_weights('model.h5')
-                prediction = model.predict(img)
-                predicted_class = np.argmax(prediction)
+                    model.load_weights('model.h5')
+                    prediction = model.predict(img)
+                    predicted_class = np.argmax(prediction)
 
-                # Display result
-                if predicted_class == 1:
-                    # st.write("Result: This is you!")
-                    st.markdown(f"<h4 style='text-align: center;'>Result: This is you!</h4>", unsafe_allow_html=True)
+                    # Display result
+                    if predicted_class == 1:
+                        st.markdown(f"<h4 style='text-align: center;'>Result: This is you!</h4>", unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"<h4 style='text-align: center;'>Result: This is not YOU!</h4>", unsafe_allow_html=True)
 
-                else:
-                    # st.write("Result: This is not you.")
-                    st.markdown(f"<h4 style='text-align: center;'>Result: This is not YOU!</h4>", unsafe_allow_html=True) 
-
-            except FileNotFoundError as e:
-                # st.warning(str(e))
-                st.markdown(""" <h5 style="color:red;">Trained model not found! Train the Model first.</h5> """, unsafe_allow_html=True)
-
-        else:
-            st.markdown(""" <h5 style="color:red;">Please upload a test image or capture one.</h5> """, unsafe_allow_html=True)
+                except FileNotFoundError as e:
+                    st.markdown(""" <h5 style="color:red;">Trained model not found! Train the Model first.</h5> """, unsafe_allow_html=True)
+            else:
+                st.markdown(""" <h5 style="color:red;">Please upload a test image or capture one.</h5> """, unsafe_allow_html=True)
 
             
     st.markdown('<div class="blank"></div>', unsafe_allow_html=True)
